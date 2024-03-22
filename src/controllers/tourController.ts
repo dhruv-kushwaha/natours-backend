@@ -31,13 +31,12 @@ export const getAllTours = asyncHandler(async function (
 
   const tours = await features.query;
 
-  // console.log(tours.length)
   res.status(200).json({
     status: "success",
     results: tours.length,
     data: {
-      tours,
-    },
+      tours
+    }
   });
 });
 
@@ -45,7 +44,7 @@ export const getTour = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = req.headers.id as string;
     const tour = await Tour.findOne({
-      _id: id,
+      _id: id
     });
 
     if (!tour) {
@@ -57,8 +56,8 @@ export const getTour = asyncHandler(
     res.status(StatusCode.OK).json({
       status: "success",
       data: {
-        tour,
-      },
+        tour
+      }
     });
   }
 );
@@ -72,8 +71,8 @@ export const createTour = asyncHandler(
     res.status(StatusCode.CREATED).json({
       status: "success",
       data: {
-        tour: newTour,
-      },
+        tour: newTour
+      }
     });
   }
 );
@@ -82,13 +81,13 @@ export const updateTour = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const updatedTour = await Tour.findOneAndUpdate(
       {
-        _id: req.headers.id,
+        _id: req.headers.id
       },
       req.body,
       {
         // new : true ? returns the newly updated document
         new: true,
-        runValidators: true,
+        runValidators: true
       }
     );
 
@@ -101,8 +100,8 @@ export const updateTour = asyncHandler(
     res.status(StatusCode.OK).json({
       status: "success",
       data: {
-        tour: updatedTour,
-      },
+        tour: updatedTour
+      }
     });
   }
 );
@@ -119,7 +118,7 @@ export const deleteTour = asyncHandler(
 
     res.status(StatusCode.NO_CONTENT).json({
       status: "success",
-      data: null,
+      data: null
     });
   }
 );
@@ -132,8 +131,8 @@ export const getTourStats = asyncHandler(async function (
   const stats = await Tour.aggregate([
     {
       $match: {
-        ratingsAverage: { $gte: 4.5 },
-      },
+        ratingsAverage: { $gte: 4.5 }
+      }
     },
 
     {
@@ -141,16 +140,16 @@ export const getTourStats = asyncHandler(async function (
         // The field to groupby
         // _id: null,
         _id: {
-          $toUpper: "$difficulty",
+          $toUpper: "$difficulty"
         },
         numTours: { $sum: 1 },
         numRatings: { $sum: "$ratingsQuantity" },
         avgRating: { $avg: "$ratingsAverage" },
         avgPrice: { $avg: "$price" },
         minPrice: { $min: "$price" },
-        maxPrice: { $max: "$price" },
-      },
-    },
+        maxPrice: { $max: "$price" }
+      }
+    }
   ]);
 
   if (!stats) {
@@ -159,7 +158,7 @@ export const getTourStats = asyncHandler(async function (
 
   res.status(200).json({
     status: "success",
-    data: { stats },
+    data: { stats }
   });
 });
 
@@ -174,50 +173,50 @@ export const getMonthlyPlan = asyncHandler(async function (
     {
       // deconstruct an array field from the input document
       // and o/p 1 document for each element of the array
-      $unwind: "$startDates",
+      $unwind: "$startDates"
     },
     {
       $match: {
         startDates: {
           $gte: new Date(`${year}-01-01`),
-          $lte: new Date(`${year}-12-31`),
-        },
-      },
+          $lte: new Date(`${year}-12-31`)
+        }
+      }
     },
 
     {
       $group: {
         _id: {
-          $month: "$startDates",
+          $month: "$startDates"
         },
         numTourStarts: { $sum: 1 },
-        tours: { $push: "$name" },
-      },
+        tours: { $push: "$name" }
+      }
     },
 
     {
       $addFields: {
-        month: "$_id",
-      },
+        month: "$_id"
+      }
     },
     {
       $project: {
-        _id: 0,
-      },
+        _id: 0
+      }
     },
 
     {
       $sort: {
-        numTourStarts: -1,
-      },
+        numTourStarts: -1
+      }
     },
     {
-      $limit: 12,
-    },
+      $limit: 12
+    }
   ]);
 
   res.status(200).json({
     status: "success",
-    data: { plan },
+    data: { plan }
   });
 });

@@ -99,10 +99,7 @@ export default function globalErrorHandler(
       if (err instanceof mongoose.Error.CastError)
         error = handleCastErrorDB(err);
       else if (err instanceof mongoose.Error.ValidationError) {
-        // if (err.code === 11000) error = handleDuplicateFieldsDB(err);
-        // else {
         error = handleValidationErrorDB(err);
-        // }
       } else if (err instanceof MongoError) {
         console.log("Entered Mongodb mongoose");
         if (err.code === 11000) error = handleDuplicateFieldsDB(err);
