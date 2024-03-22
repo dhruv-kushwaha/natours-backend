@@ -31,6 +31,7 @@ export const getAllTours = asyncHandler(async function (
 
   const tours = await features.query;
 
+  // console.log(tours.length)
   res.status(200).json({
     status: "success",
     results: tours.length,
