@@ -1,6 +1,6 @@
 import express from "express";
 import tourRouter from "./tourRoutes";
-import userRouter from "./tourRoutes";
+import userRouter from "./userRoutes";
 
 const router = express.Router();
 

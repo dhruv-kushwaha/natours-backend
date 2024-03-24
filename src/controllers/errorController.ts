@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import AppError, { DBError } from "../utils/AppError";
-import mongoose, { Error as MongooseError, mongo } from "mongoose";
+import mongoose, { Error as MongooseError } from "mongoose";
 import { JsonWebTokenError } from "jsonwebtoken";
 import { MongoError } from "mongodb";
 import { StatusCode } from "../utils/globalConstants";

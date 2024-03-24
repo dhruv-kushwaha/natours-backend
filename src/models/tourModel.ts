@@ -1,7 +1,8 @@
-import mongoose, { CallbackError } from "mongoose";
+import mongoose from "mongoose";
 import { TTourType } from "../schema/tourSchema";
 import slugify from "slugify";
-import { NextFunction } from "express";
+import { User } from "./userModel";
+import { TUserType } from "../schema/userSchema";
 
 const tourSchema = new mongoose.Schema<TTourType>(
   {
@@ -92,11 +93,38 @@ const tourSchema = new mongoose.Schema<TTourType>(
       type: Boolean,
       default: false,
     },
+
+    startLocation: {
+      type: {
+        type: String,
+        default: "Point",
+        enum: ["Point"],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+
+    locations: [
+      {
+        type: {
+          type: String,
+          default: "Point",
+          enum: ["Point"],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+
+    guides: Array,
   },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  }
+  },
 );
 
 tourSchema.virtual("durationWeeks").get(function () {
@@ -108,11 +136,27 @@ tourSchema.pre("save", function (next) {
   next();
 });
 
+// tourSchema.pre("save", async function (next) {
+//   if (this.guides && this.guides.length > 0) {
+//     const guidesPromises = this.guides.map(async (id) => {
+//       const guide = await User.findById(id);
+//       return guide;
+//     });
+
+//     this.guides = (await Promise.all(guidesPromises)).filter(
+//       Boolean,
+//     ) as unknown as string[];
+//   }
+//   next();
+// });
+
 tourSchema.pre(/^find/, function (next) {
   // (this as mongoose.Query<any, any, {}, any, "/^find/i">).find({
-  (this as mongoose.Query<any, any>).find({
-    secretTour: { $ne: true },
-  });
+  (this as mongoose.Query<any, any>)
+    .find({
+      secretTour: { $ne: true },
+    })
+    .select("-__v");
   (this as any).start = Date.now();
   next();
 });

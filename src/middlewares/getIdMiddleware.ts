@@ -10,7 +10,7 @@ export const getId = function getId(
 ) {
   try {
     const id: string = req.params.id;
-    // console.log(id);
+    console.log(id);
 
     // if (!mongoose.isValidObjectId(id)) {
     if (!mongoose.Types.ObjectId.isValid(id)) {

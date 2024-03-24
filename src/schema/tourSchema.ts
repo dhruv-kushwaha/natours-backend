@@ -1,4 +1,5 @@
 import z from "zod";
+import { TUserType } from "./userSchema";
 
 export const BasicTourSchema = z.object({
   name: z
@@ -41,6 +42,35 @@ export const BasicTourSchema = z.object({
 
   startDates: z.array(z.string().or(z.date())).optional(),
   secretTour: z.boolean().optional().default(false),
+  // "startLocation": {
+  //   "description": "Miami, USA",
+  //   "type": "Point",
+  //   "coordinates": [-80.185942, 25.774772],
+  //   "address": "301 Biscayne Blvd, Miami, FL 33132, USA"
+  // }
+  startLocation: z
+    .object({
+      description: z.string(),
+      type: z.enum(["Point"]).default("Point"),
+      coordinates: z.array(z.number()),
+      address: z.string(),
+    })
+    .optional(),
+  locations: z
+    .array(
+      z
+        .object({
+          description: z.string(),
+          type: z.enum(["Point"]).default("Point"),
+          coordinates: z.array(z.number()),
+          address: z.string(),
+          day: z.number(),
+        })
+        .optional(),
+    )
+    .optional(),
+
+  guides: z.array(z.string()).optional(),
 });
 
 const refineFunction = (val: any) => val.price > val.priceDiscount;
