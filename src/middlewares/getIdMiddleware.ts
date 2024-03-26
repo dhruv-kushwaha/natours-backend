@@ -3,23 +3,23 @@ import mongoose from "mongoose";
 import AppError from "../utils/AppError";
 import { StatusCode } from "../utils/globalConstants";
 
-export const getId = function getId(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  try {
-    const id: string = req.params.id;
-    console.log(id);
+export const getId = function (idField: string) {
+  return function (req: Request, res: Response, next: NextFunction) {
+    try {
+      const id: string = req.params[idField];
+      console.log(id);
 
-    // if (!mongoose.isValidObjectId(id)) {
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return next(new AppError("Invalid document id", StatusCode.BAD_REQUEST));
+      // if (!mongoose.isValidObjectId(id)) {
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return next(
+          new AppError("Invalid document id", StatusCode.BAD_REQUEST),
+        );
+      }
+
+      req.headers[idField] = id as string;
+      next();
+    } catch (err) {
+      next(err);
     }
-
-    req.headers.id = id as string;
-    next();
-  } catch (err) {
-    next(err);
-  }
+  };
 };

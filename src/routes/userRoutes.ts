@@ -5,6 +5,7 @@ import {
   deleteUser,
   getAllUsers,
   getUser,
+  updateMe,
   updateUser,
 } from "../controllers/userController";
 import { parseBody } from "../middlewares/zodSchemaMiddleware";
@@ -21,7 +22,6 @@ import {
   signup,
   updatePassword,
 } from "../controllers/authController";
-import { getId } from "../middlewares/getIdMiddleware";
 import { authenticateJwt } from "../middlewares/authMiddleware";
 
 const router = express.Router();
@@ -38,11 +38,11 @@ router
   .route("/updateMyPassword")
   .patch(authenticateJwt, parseBody(UpdatePasswordSchema), updatePassword);
 
-router.patch("/updateMe", authenticateJwt, deleteMe);
+router.patch("/updateMe", authenticateJwt, updateMe);
 router.delete("/deleteMe", authenticateJwt, deleteMe);
 
 router.route("/").get(getAllUsers).post(createUser);
 
-router.route("/:id").get(getUser).patch(updateUser).delete(deleteUser);
+router.route("/:userId").get(getUser).patch(updateUser).delete(deleteUser);
 
 export default router;

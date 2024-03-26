@@ -1,10 +1,12 @@
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
 import { TTourType } from "../schema/tourSchema";
 import slugify from "slugify";
-import { User } from "./userModel";
-import { TUserType } from "../schema/userSchema";
 
-const tourSchema = new mongoose.Schema<TTourType>(
+export interface ITourMethods {}
+
+export type TourModel = Model<TTourType, object, ITourMethods>;
+
+const tourSchema = new mongoose.Schema<TTourType, TourModel, ITourMethods>(
   {
     name: {
       type: String,
@@ -119,13 +121,25 @@ const tourSchema = new mongoose.Schema<TTourType>(
       },
     ],
 
-    guides: Array,
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   },
 );
+
+// Virtual populate
+tourSchema.virtual("reviews", {
+  ref: "Review",
+  foreignField: "tour",
+  localField: "_id",
+});
 
 tourSchema.virtual("durationWeeks").get(function () {
   return this.duration / 7;
@@ -149,6 +163,14 @@ tourSchema.pre("save", function (next) {
 //   }
 //   next();
 // });
+
+tourSchema.pre(/^find/, function (next) {
+  (this as mongoose.Query<any, any>).populate({
+    path: "guides",
+    select: "-__v -passwordChangedAt",
+  });
+  next();
+});
 
 tourSchema.pre(/^find/, function (next) {
   // (this as mongoose.Query<any, any, {}, any, "/^find/i">).find({
@@ -179,5 +201,5 @@ tourSchema.pre("aggregate", function (next) {
   next();
 });
 
-const Tour = mongoose.model<TTourType>("Tour", tourSchema);
+const Tour = mongoose.model<TTourType, TourModel>("Tour", tourSchema);
 export default Tour;

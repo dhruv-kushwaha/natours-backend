@@ -13,9 +13,12 @@ import { getId } from "../middlewares/getIdMiddleware";
 import { parseBody } from "../middlewares/zodSchemaMiddleware";
 import { TourSchema, UpdateTourSchema } from "../schema/tourSchema";
 import { authenticateJwt } from "../middlewares/authMiddleware";
-import { restrict } from "../controllers/restrictMiddleware";
+import { restrict } from "../middlewares/restrictMiddleware";
+import reviewRouter from "./reviewRoutes";
 
 const router = express.Router();
+
+router.use("/:tourId/reviews", reviewRouter);
 
 router.get("/top-5-cheap", aliasTopTours, getAllTours);
 router.route("/tour-stats").get(getTourStats);
@@ -27,11 +30,23 @@ router
   .post(parseBody(TourSchema), createTour);
 
 router
-  .route("/:id")
-  .all(getId)
+  .route("/:tourId")
+  .all(getId("tourId"))
   .get(getTour)
+  .all(authenticateJwt, restrict("admin", "lead-guide"))
   .patch(parseBody(UpdateTourSchema), updateTour)
-  .delete(authenticateJwt, restrict("admin", "lead-guide"), deleteTour);
+  .delete(deleteTour);
+
+// router
+//   .route("/:tourId/reviews")
+//   .post(
+//     authenticateJwt,
+//     restrict("user"),
+//     getId("tourId"),
+//     setTourUserIds,
+//     parseBody(CreateReviewSchema),
+//     createReview,
+//   );
 
 // router.param("id", checkID);
 export default router;

@@ -1,5 +1,5 @@
 import z from "zod";
-import { TUserType } from "./userSchema";
+import { BasicUserSchema, TUserType } from "./userSchema";
 
 export const BasicTourSchema = z.object({
   name: z
@@ -28,7 +28,7 @@ export const BasicTourSchema = z.object({
   ratingsQuantity: z.number().optional().default(0),
 
   price: z.number({ required_error: "A tour must have a price" }),
-  priceDiscount: z.number().optional(),
+  priceDiscount: z.number().optional().default(0),
 
   summary: z.string({ required_error: "A tour must have a summary" }).trim(),
 
@@ -73,7 +73,15 @@ export const BasicTourSchema = z.object({
   guides: z.array(z.string()).optional(),
 });
 
-const refineFunction = (val: any) => val.price > val.priceDiscount;
+const refineFunction = (val: any) => {
+  if (val.price && val.priceDiscount) {
+    return val.price > val.priceDiscount;
+  } else if (!val.price && val.priceDiscount) {
+    return false;
+  }
+  return true;
+};
+
 const refineConfig = {
   path: ["priceDiscount"],
   message: `Discount price should be below regular price`,

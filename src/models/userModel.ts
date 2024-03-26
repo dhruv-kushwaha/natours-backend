@@ -4,13 +4,13 @@ import crypto from "crypto";
 
 import { TUserType } from "../schema/userSchema";
 
-interface IUserMethods {
+export interface IUserMethods {
   correctPassword(reqPassword: string, userPassword: string): Promise<boolean>;
   changedPasswordAfter(JWTTimeStamp: number): boolean;
   createPasswordResetToken(): string;
 }
 
-type UserModel = Model<TUserType, object, IUserMethods>;
+export type UserModel = Model<TUserType, object, IUserMethods>;
 // type UserModel = Model<TUserType, {}, IUserMethods>;
 
 const userSchema = new mongoose.Schema<TUserType, UserModel, IUserMethods>({

@@ -3,6 +3,7 @@ import { StatusCode } from "../utils/globalConstants";
 import { asyncHandler } from "../utils/asyncHandler";
 import { User } from "../models/userModel";
 import AppError from "../utils/AppError";
+import { deleteOne, getOne, updateOne } from "./handlerFactory";
 
 export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
   const users = await User.find();
@@ -51,30 +52,16 @@ export const deleteMe = asyncHandler(async function (
   });
 });
 
-export const getUser = (req: Request, res: Response) => {
-  res.status(500).json({
-    status: "error",
-    message: "This route is not yet defined!",
-  });
-};
+export const getUser = getOne(User, "userId");
 
 export const createUser = (req: Request, res: Response) => {
   res.status(500).json({
     status: "error",
-    message: "This route is not yet defined!",
+    message: "This route is not defined! Please use \\signup ",
   });
 };
 
-export const updateUser = (req: Request, res: Response) => {
-  res.status(500).json({
-    status: "error",
-    message: "This route is not yet defined!",
-  });
-};
+// Do not update Password with this
+export const updateUser = updateOne(User, "userId");
 
-export const deleteUser = (req: Request, res: Response) => {
-  res.status(500).json({
-    status: "error",
-    message: "This route is not yet defined!",
-  });
-};
+export const deleteUser = deleteOne(User, "userId");
