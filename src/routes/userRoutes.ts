@@ -4,6 +4,7 @@ import {
   deleteMe,
   deleteUser,
   getAllUsers,
+  getMe,
   getUser,
   updateMe,
   updateUser,
@@ -23,6 +24,7 @@ import {
   updatePassword,
 } from "../controllers/authController";
 import { authenticateJwt } from "../middlewares/authMiddleware";
+import { restrict } from "../middlewares/restrictMiddleware";
 
 const router = express.Router();
 
@@ -34,13 +36,18 @@ router
   .route("/resetPassword/:token")
   .patch(parseBody(ResetPasswordSchema), resetPassword);
 
+router.use(authenticateJwt);
+
 router
   .route("/updateMyPassword")
-  .patch(authenticateJwt, parseBody(UpdatePasswordSchema), updatePassword);
+  .patch(parseBody(UpdatePasswordSchema), updatePassword);
 
-router.patch("/updateMe", authenticateJwt, updateMe);
-router.delete("/deleteMe", authenticateJwt, deleteMe);
+router.get("/me", getMe);
+// Implement this
+router.patch("/updateMe", updateMe);
+router.delete("/deleteMe", deleteMe);
 
+router.use(restrict("admin"));
 router.route("/").get(getAllUsers).post(createUser);
 
 router.route("/:userId").get(getUser).patch(updateUser).delete(deleteUser);

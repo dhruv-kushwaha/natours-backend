@@ -22,12 +22,24 @@ router.use("/:tourId/reviews", reviewRouter);
 
 router.get("/top-5-cheap", aliasTopTours, getAllTours);
 router.route("/tour-stats").get(getTourStats);
-router.route("/monthly-plan/:year").get(getMonthlyPlan);
+
+router
+  .route("/monthly-plan/:year")
+  .get(
+    authenticateJwt,
+    restrict("admin", "lead-guide", "guide"),
+    getMonthlyPlan,
+  );
 
 router
   .route("/")
-  .get(authenticateJwt, getAllTours)
-  .post(parseBody(TourSchema), createTour);
+  .get(getAllTours)
+  .post(
+    authenticateJwt,
+    restrict("admin", "lead-guide"),
+    parseBody(TourSchema),
+    createTour,
+  );
 
 router
   .route("/:tourId")

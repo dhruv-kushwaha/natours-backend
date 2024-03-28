@@ -134,6 +134,13 @@ const tourSchema = new mongoose.Schema<TTourType, TourModel, ITourMethods>(
   },
 );
 
+// single index
+// tourSchema.index({ price: 1 });
+
+//compound Index
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+tourSchema.index({ slug: 1 });
+
 // Virtual populate
 tourSchema.virtual("reviews", {
   ref: "Review",

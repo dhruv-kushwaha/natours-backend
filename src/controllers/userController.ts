@@ -4,9 +4,15 @@ import { asyncHandler } from "../utils/asyncHandler";
 import { User } from "../models/userModel";
 import AppError from "../utils/AppError";
 import { deleteOne, getOne, updateOne } from "./handlerFactory";
+import APIFeatures from "../utils/apiFeatures";
 
 export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
-  const users = await User.find();
+  const features = new APIFeatures(User.find(), req.query)
+    .filter()
+    .limitFields()
+    .paginate()
+    .sort();
+  const users = await features.query;
 
   res.status(StatusCode.OK).json({
     status: "success",
@@ -16,6 +22,8 @@ export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
     },
   });
 });
+
+export const getMe = getOne(User, "userId");
 
 export const updateMe = asyncHandler(async function (
   req: Request,
